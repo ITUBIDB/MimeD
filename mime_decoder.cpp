@@ -79,7 +79,8 @@ int main(int argc , char* argv[]){
 
     while(getline(cin, INPUT)) {
         //search until mail, newline indicates that mail content is starting
-        if(INPUT[0] == '\r' || INPUT[0] == '\n') {
+
+        if((int)INPUT[0] == 10 || (int)INPUT[0] == 13 || (int)INPUT[0] == 0) {
             break;
         }
 
@@ -98,15 +99,16 @@ int main(int argc , char* argv[]){
                     break;
                 }
             }
+
+            string temp = header_decode(remove_mime_space(remove_newline(INPUT)));
+            cout << temp;
+            if(temp.size() != 0) {
+                cout << endl;
+            }
             break;
         }
     }
 
-    string temp = header_decode(remove_mime_space(remove_newline(INPUT)));
-    cout << temp;
-    if(temp.size() != 0) {
-        cout << endl;
-    }
     return 0;
 }
 
