@@ -80,6 +80,7 @@ int main(int argc , char* argv[]){
         }
     }
 
+    string content_charset;
     while(getline(cin, INPUT)) {
         //search until mail, newline indicates that mail content is starting
 
@@ -87,11 +88,11 @@ int main(int argc , char* argv[]){
             break;
         }
 
-        string content_charset;
-        if(is_header_exist(INPUT, "Content-Type")){
+
+        if(is_header_exist(INPUT, "Content-type")){
 
             if(INPUT.size() > 13){ // size of 'Content-Type:"
-                INPUT = left_trim_string(extract_header_field(INPUT, "Content-Type"));
+                INPUT = left_trim_string(extract_header_field(INPUT, "Content-type"));
             }
 
             string multiLineHeader;
@@ -106,16 +107,23 @@ int main(int argc , char* argv[]){
             INPUT = remove_newline(INPUT);
 
             if(INPUT.find("charset=") != -1){
-               int charset_start = INPUT.find("charset=") + 9;
+                int charset_start = INPUT.find("charset=") + 8;
                 for(int i=charset_start; i < INPUT.size(); i++){
                     if(INPUT[i] == 32){
                         break;
                     }
                     content_charset = content_charset + INPUT[i];
                 }
-               is_content_charset_found = true;
-           }
+                is_content_charset_found = true;
 
+            }
+
+            /*cout << "---" << endl;
+            cout << "in" << endl;
+            cout << content_charset << endl;
+            cout << is_content_charset_found << endl;
+            cout << INPUT << endl;
+            cout << "---" << endl; */
         }
 
         if(is_header_exist(INPUT, PARAMETER)) {
@@ -143,10 +151,10 @@ int main(int argc , char* argv[]){
                     }
                 }else{
                     for(int i=0; i<INPUT.size(); i++){
-                        if(INPUT[i] > 127){
+                        if((int)INPUT[i] < 127 && (int)INPUT[i] >= 0){
                             temp = temp + INPUT[i];
-                        }else{
-                            temp = temp + charset_table(INPUT[i], content_charset);
+                        }else if((int)INPUT[i] < 0){
+                            temp = temp + charset_table((int)INPUT[i] + 256, content_charset);
                         }
                     }
                 }
@@ -264,7 +272,7 @@ string header_decode(string header){
             }
             is_input_includes_mime = true;
         } else {
-            if(header[i] > 127){
+            if(header[i] < 0){
                 is_non_ascii_exist = true;
             }
             output = output + header[i];
