@@ -4829,6 +4829,7 @@ string charset_table(int char_index, string charset) {
     }
 
     if(charset_array[char_index -1][2] != '\x0') {
+
         output << charset_array[char_index -1][0] << charset_array[char_index -1][1] << charset_array[char_index -1][2];
     } else {
         output << charset_array[char_index -1][0] << charset_array[char_index -1][1];
