@@ -14,7 +14,10 @@ string utf8_table(int index);
 string remove_newline(string input);
 string remove_mime_space(string input);
 bool is_header_exist(string header_line, string search_header);
-
+static bool is_content_charset_found = false;
+static bool is_input_includes_mime = false;
+static bool encoding_error = false;
+static bool is_non_ascii_exist = false;
 //http://renenyffenegger.ch/notes/development/Base64/Encoding-and-decoding-base-64-with-cpp
 static const std::string base64_chars =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -77,11 +80,50 @@ int main(int argc , char* argv[]){
         }
     }
 
+    string content_charset;
     while(getline(cin, INPUT)) {
         //search until mail, newline indicates that mail content is starting
 
         if((int)INPUT[0] == 10 || (int)INPUT[0] == 13 || (int)INPUT[0] == 0) {
             break;
+        }
+
+
+        if(is_header_exist(INPUT, "Content-type")){
+
+            if(INPUT.size() > 13){ // size of 'Content-Type:"
+                INPUT = left_trim_string(extract_header_field(INPUT, "Content-type"));
+            }
+
+            string multiLineHeader;
+            while(getline(cin, multiLineHeader)) {
+                if( (multiLineHeader[0] == ' ') || (multiLineHeader[0] == '\t') ) {
+                    INPUT = INPUT  + multiLineHeader;
+                } else {
+                    break;
+                }
+            }
+
+            INPUT = remove_newline(INPUT);
+
+            if(INPUT.find("charset=") != -1){
+                int charset_start = INPUT.find("charset=") + 8;
+                for(int i=charset_start; i < INPUT.size(); i++){
+                    if(INPUT[i] == 32){
+                        break;
+                    }
+                    content_charset = content_charset + INPUT[i];
+                }
+                is_content_charset_found = true;
+
+            }
+
+            /*cout << "---" << endl;
+            cout << "in" << endl;
+            cout << content_charset << endl;
+            cout << is_content_charset_found << endl;
+            cout << INPUT << endl;
+            cout << "---" << endl; */
         }
 
         if(is_header_exist(INPUT, PARAMETER)) {
@@ -101,6 +143,24 @@ int main(int argc , char* argv[]){
             }
 
             string temp = header_decode(remove_mime_space(remove_newline(INPUT)));
+            if(is_input_includes_mime == false && is_content_charset_found == true && encoding_error == false && is_non_ascii_exist == true){
+                temp = "";
+                if(content_charset == "utf-8" || content_charset == "UTF-8"){
+                    for(int i=0; i<INPUT.size(); i++){
+                        temp = temp + utf8_table(INPUT[i]);
+                    }
+                }else{
+                    for(int i=0; i<INPUT.size(); i++){
+                        if((int)INPUT[i] < 127 && (int)INPUT[i] >= 0){
+                            temp = temp + INPUT[i];
+                        }else if((int)INPUT[i] < 0){
+                            temp = temp + charset_table((int)INPUT[i] + 256, content_charset);
+                        }
+                    }
+                }
+
+            }
+
             cout << temp;
             if(temp.size() != 0) {
                 cout << endl;
@@ -153,6 +213,7 @@ string header_decode(string header){
 
                 if(i >= headerLength) {
                     //ERROR
+                    encoding_error = true;
                     return header;
                 }
             }
@@ -164,12 +225,14 @@ string header_decode(string header){
                 mimeEncodeType = 1;
             } else {
                 // ERROR
+                encoding_error = true;
                 return header;
             }
             i++;
 
             if(header[i] != '?') {
                 //ERROR;
+                encoding_error = true;
                 return header;
             }
             i++;
@@ -179,6 +242,7 @@ string header_decode(string header){
                 i++;
                 if(i >= headerLength) {
                     //ERROR
+                    encoding_error = true;
                     return header;
                 }
             }
@@ -206,7 +270,11 @@ string header_decode(string header){
                     }
                 }
             }
+            is_input_includes_mime = true;
         } else {
+            if(header[i] < 0){
+                is_non_ascii_exist = true;
+            }
             output = output + header[i];
         }
     }
@@ -4761,6 +4829,7 @@ string charset_table(int char_index, string charset) {
     }
 
     if(charset_array[char_index -1][2] != '\x0') {
+
         output << charset_array[char_index -1][0] << charset_array[char_index -1][1] << charset_array[char_index -1][2];
     } else {
         output << charset_array[char_index -1][0] << charset_array[char_index -1][1];
