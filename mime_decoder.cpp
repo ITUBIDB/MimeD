@@ -71,7 +71,6 @@ std::string base64_decode(std::string const& encoded_string) {
 
 int main(int argc , char* argv[]){
     string INPUT,PARAMETER;
-    bool DEBUG_MOD = false;
 
     string arg = argv[1];
     if((arg == "-h") || (arg == "--header")) {
@@ -92,7 +91,7 @@ int main(int argc , char* argv[]){
         }
         string multiLineHeader;
 
-        cout << "+++++" << INPUT << "+++++ " << is_header_exist(INPUT, PARAMETER) << " ++++" <<  endl;
+        //cout << "+++++" << INPUT << "+++++ " << is_header_exist(INPUT, PARAMETER) << " ++++" <<  endl;
 
         if(is_header_exist(INPUT, "Content-type") || is_header_exist(INPUT, "Content-Type")){
 
@@ -128,12 +127,12 @@ int main(int argc , char* argv[]){
 
 
             //DEBUG
-            cout << "---" << endl;
+            /*cout << "---" << endl;
             cout << "in" << endl;
             cout << content_charset << endl;
             cout << is_content_charset_found << endl;
             cout << INPUT << endl;
-            cout << "---" << endl;
+            cout << "---" << endl; */
 
             if(nonMultiline == true){
                 INPUT = multiLineHeader;
@@ -160,23 +159,23 @@ int main(int argc , char* argv[]){
 
 
             //DEBUG
-            cout << "***" << endl;
+            /*cout << "***" << endl;
             cout << "///" << decoded_mime << endl;
-            cout << "***" << endl;
+            cout << "***" << endl;*/
 
             //break;
         }
     }
-    cout << "???" << endl;
+    //DEBUG
+    /*cout << "???" << endl;
     cout << is_input_includes_mime << endl;
     cout << is_content_charset_found << endl;
     cout << encoding_error << endl;
     cout << is_non_ascii_exist << endl;
     cout << content_charset << endl;
     cout << "???" << endl;
-
     cout << "======" << decoded_mime << endl;
-    cout << "======44" << INPUT << endl;
+    cout << "======44" << INPUT << endl; */
     string output_mime;
 
     if(is_input_includes_mime == false && is_content_charset_found == true && encoding_error == false && is_non_ascii_exist == true){
@@ -196,7 +195,7 @@ int main(int argc , char* argv[]){
         }
     }else if(is_input_includes_mime == false && is_content_charset_found == false && encoding_error == false && is_non_ascii_exist == true){
         //decoded_mime = "";
-        cout << "{{{in" << endl;
+        //cout << "{{{in" << endl;
         for(int i=0; i<decoded_mime.size(); i++){
             if((int)decoded_mime[i] < 127 && (int)decoded_mime[i] >= 0){
                 //cout << "{{" << decoded_mime[i] << endl;
