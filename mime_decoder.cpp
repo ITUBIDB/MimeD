@@ -97,6 +97,8 @@ int main(int argc , char* argv[]){
 
             if(INPUT.size() > 13){ // size of 'Content-Type:"
                 INPUT = left_trim_string(extract_header_field(INPUT, "Content-type"));
+                //cout << "trim " << INPUT << " " << INPUT.size() << endl;
+
             }
 
 
@@ -113,7 +115,21 @@ int main(int argc , char* argv[]){
             INPUT = remove_newline(INPUT);
 
             if(INPUT.find("charset=") != -1){
-                int charset_start = INPUT.find("charset=") + 8;
+
+                for(int i=1; i<17; i++){
+                    if(INPUT.find("iso-8859-" + to_string(i)) != -1 || INPUT.find("ISO-8859-" + to_string(i)) != -1){
+                        content_charset = "iso-8859-" + to_string(i);
+                        is_content_charset_found = true;
+                    }
+                }
+
+                if(INPUT.find("utf-8") != -1 || INPUT.find("UTF-8") != -1){
+                    content_charset = "utf-8";
+                    is_content_charset_found = true;
+                }
+
+
+                /*int charset_start = INPUT.find("charset=") + 8;
                 for(int i=charset_start; i < INPUT.size(); i++){
                     if(isalnum(INPUT[i]) || (int)INPUT[i] == 45){
                         content_charset = content_charset + INPUT[i];
@@ -121,7 +137,7 @@ int main(int argc , char* argv[]){
                         break;
                     }
                 }
-                is_content_charset_found = true;
+                is_content_charset_found = true; */
 
             }
 
@@ -161,7 +177,7 @@ int main(int argc , char* argv[]){
             //DEBUG
             /*cout << "***" << endl;
             cout << "///" << decoded_mime << endl;
-            cout << "***" << endl;*/
+            cout << "***" << endl; */
 
             //break;
         }
