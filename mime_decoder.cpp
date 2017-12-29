@@ -117,10 +117,13 @@ int main(int argc , char* argv[]){
             if(INPUT.find("charset=") != -1){
 
                 for(int i=1; i<17; i++){
-                    if(INPUT.find("iso-8859-" + to_string(i)) != -1 || INPUT.find("ISO-8859-" + to_string(i)) != -1){
-                        content_charset = "iso-8859-" + to_string(i);
+                    stringstream number;
+                    number << i;
+                    if(INPUT.find("iso-8859-" + number.str()) != -1 || INPUT.find("ISO-8859-" + number.str()) != -1){
+                        content_charset = "iso-8859-" + number.str();
                         is_content_charset_found = true;
                     }
+                    number.str("");
                 }
 
                 if(INPUT.find("utf-8") != -1 || INPUT.find("UTF-8") != -1){
