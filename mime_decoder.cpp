@@ -91,16 +91,11 @@ int main(int argc , char* argv[]){
         }
         string multiLineHeader;
 
-        //cout << "+++++" << INPUT << "+++++ " << is_header_exist(INPUT, PARAMETER) << " ++++" <<  endl;
-
         if(is_header_exist(INPUT, "Content-type") || is_header_exist(INPUT, "Content-Type")){
 
             if(INPUT.size() > 13){ // size of 'Content-Type:"
                 INPUT = left_trim_string(extract_header_field(INPUT, "Content-type"));
-                //cout << "trim " << INPUT << " " << INPUT.size() << endl;
-
             }
-
 
             bool nonMultiline = false;
             while(getline(cin, multiLineHeader)) {
@@ -114,12 +109,12 @@ int main(int argc , char* argv[]){
 
             INPUT = remove_newline(INPUT);
 
-            if(INPUT.find("charset=") != -1){
+            if(INPUT.find("charset=") != -1) {
 
-                for(int i=1; i<17; i++){
+                for(int i=1; i<17; i++) {
                     stringstream number;
                     number << i;
-                    if(INPUT.find("iso-8859-" + number.str()) != -1 || INPUT.find("ISO-8859-" + number.str()) != -1){
+                    if(INPUT.find("iso-8859-" + number.str()) != -1 || INPUT.find("ISO-8859-" + number.str()) != -1) {
                         content_charset = "iso-8859-" + number.str();
                         is_content_charset_found = true;
                     }
@@ -130,28 +125,7 @@ int main(int argc , char* argv[]){
                     content_charset = "utf-8";
                     is_content_charset_found = true;
                 }
-
-
-                /*int charset_start = INPUT.find("charset=") + 8;
-                for(int i=charset_start; i < INPUT.size(); i++){
-                    if(isalnum(INPUT[i]) || (int)INPUT[i] == 45){
-                        content_charset = content_charset + INPUT[i];
-                    }else{
-                        break;
-                    }
-                }
-                is_content_charset_found = true; */
-
             }
-
-
-            //DEBUG
-            /*cout << "---" << endl;
-            cout << "in" << endl;
-            cout << content_charset << endl;
-            cout << is_content_charset_found << endl;
-            cout << INPUT << endl;
-            cout << "---" << endl; */
 
             if(nonMultiline == true){
                 INPUT = multiLineHeader;
@@ -175,26 +149,8 @@ int main(int argc , char* argv[]){
             }
 
             decoded_mime = header_decode(remove_mime_space(remove_newline(INPUT)));
-
-
-            //DEBUG
-            /*cout << "***" << endl;
-            cout << "///" << decoded_mime << endl;
-            cout << "***" << endl; */
-
-            //break;
         }
     }
-    //DEBUG
-    /*cout << "???" << endl;
-    cout << is_input_includes_mime << endl;
-    cout << is_content_charset_found << endl;
-    cout << encoding_error << endl;
-    cout << is_non_ascii_exist << endl;
-    cout << content_charset << endl;
-    cout << "???" << endl;
-    cout << "======" << decoded_mime << endl;
-    cout << "======44" << INPUT << endl; */
     string output_mime;
 
     if(is_input_includes_mime == false && is_content_charset_found == true && encoding_error == false && is_non_ascii_exist == true){
@@ -212,19 +168,18 @@ int main(int argc , char* argv[]){
                 }
             }
         }
-    }else if(is_input_includes_mime == false && is_content_charset_found == false && encoding_error == false && is_non_ascii_exist == true){
+    }else if(is_input_includes_mime == false && is_content_charset_found == false && encoding_error == false && is_non_ascii_exist == true) {
         //decoded_mime = "";
-        //cout << "{{{in" << endl;
-        for(int i=0; i<decoded_mime.size(); i++){
-            if((int)decoded_mime[i] < 127 && (int)decoded_mime[i] >= 0){
+        for(int i=0; i<decoded_mime.size(); i++) {
+            if((int)decoded_mime[i] < 127 && (int)decoded_mime[i] >= 0) {
                 //cout << "{{" << decoded_mime[i] << endl;
                 output_mime = output_mime + decoded_mime[i];
-            }else if((int)decoded_mime[i] < 0){
+            } else if((int)decoded_mime[i] < 0) {
                 //cout << "}}" << decoded_mime[i] << endl;
                 output_mime = output_mime + charset_table((int)decoded_mime[i] + 256, "iso-8859-1");
             }
         }
-    }else{
+    } else {
         output_mime = decoded_mime;
     }
 
@@ -236,8 +191,18 @@ int main(int argc , char* argv[]){
     return 0;
 }
 
+void to_lower(string &s) {
+	for (int i = 0; i < s.length(); i++)
+		if (s[i] >= 'A' && s[i] <= 'Z')
+			s[i] = s[i] + 32;
+}
+
 bool is_header_exist(string header_line, string search_header) {
     search_header = search_header + ":";
+    //search non-case sensitive
+    to_lower(header_line);
+    to_lower(search_header);
+    
     return (header_line.substr(0, search_header.size()) == search_header);
 }
 
@@ -246,10 +211,10 @@ string extract_header_field(string line, string extract_parameter) {
     return line.substr(extract_parameter.size(), line.size() - extract_parameter.size());
 }
 
-string left_trim_string(string line){
+string left_trim_string(string line) {
     int spaceLeftCounter = 0;
     //trim left
-    for(int i=0; i<line.size(); i++){
+    for(int i=0; i<line.size(); i++) {
         if((line[i] == ' ') || (line[i] == '\t')){
             spaceLeftCounter++;
         } else {
